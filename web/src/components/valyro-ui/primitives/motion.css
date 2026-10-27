@@ -1,0 +1,133 @@
+/*
+ * Spring motion: the presets behind the components' `animation="spring"`.
+ *
+ * The curves (--ui-spring-smooth / -snappy / -bouncy) are kit-wide tokens in styles/motion.css. Each preset
+ * runs for calc(var(--ui-duration-slow) * <settle factor>), so a theme's tempo carries over and the themes'
+ * reduced-motion block (durations of 1 ms) makes every spring instant.
+ */
+
+/* ── Floating layers (tooltip, popover, hover card, menu): Floating animation="spring" ──
+   Springs out of the anchor's side: a short travel from the anchor plus a scale from the corner the
+   floating layer grows from (--ui-transform-origin, set by useFloating). Exit is a quick fade. */
+.ui-animate-spring {
+  transform-origin: var(--ui-transform-origin, top center);
+  --_spring-x: 0px;
+  --_spring-y: -8px;
+}
+
+.ui-animate-spring[data-side='top'] {
+  --_spring-y: 8px;
+}
+
+.ui-animate-spring[data-side='left'] {
+  --_spring-x: 8px;
+  --_spring-y: 0px;
+}
+
+.ui-animate-spring[data-side='right'] {
+  --_spring-x: -8px;
+  --_spring-y: 0px;
+}
+
+.ui-animate-spring[data-state='open'] {
+  animation:
+    ui-fade-in var(--ui-duration) var(--ui-ease),
+    ui-spring-pop-in calc(var(--ui-duration-slow) * 1.36) var(--ui-spring-snappy);
+}
+
+.ui-animate-spring[data-state='closed'] {
+  animation: ui-spring-pop-out var(--ui-duration-fast) var(--ui-ease) forwards;
+}
+
+@keyframes ui-spring-pop-in {
+  from {
+    transform: translate(var(--_spring-x), var(--_spring-y)) scale(0.88);
+  }
+}
+
+@keyframes ui-spring-pop-out {
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--_spring-x) / 2), calc(var(--_spring-y) / 2)) scale(0.96);
+  }
+}
+
+/* ── Modals (dialog, confirm dialog, drawer): ModalLayer animation="spring" ──
+   Centred panels drop in from `data-from` with a slight tilt and settle with a little overshoot;
+   edge panels slide in from their own edge critically damped, so no gap opens at the screen edge. */
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring'] {
+  --_from-x: 0px;
+  --_from-y: -48px;
+  --_tilt-x: 10deg;
+  --_tilt-y: 0deg;
+}
+
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring'][data-from='bottom'] {
+  --_from-y: 48px;
+  --_tilt-x: -10deg;
+}
+
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring'][data-from='left'] {
+  --_from-x: -48px;
+  --_from-y: 0px;
+  --_tilt-x: 0deg;
+  --_tilt-y: -10deg;
+}
+
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring'][data-from='right'] {
+  --_from-x: 48px;
+  --_from-y: 0px;
+  --_tilt-x: 0deg;
+  --_tilt-y: 10deg;
+}
+
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring']:is([data-placement='center'], [data-placement='top'])[data-state='open'] {
+  animation:
+    ui-fade-in var(--ui-duration) var(--ui-ease),
+    ui-spring-modal-in calc(var(--ui-duration-slow) * 1.36) var(--ui-spring-snappy);
+}
+
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring']:is([data-placement='center'], [data-placement='top'])[data-state='closed'] {
+  animation: ui-spring-modal-out var(--ui-duration) var(--ui-ease) forwards;
+}
+
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring'][data-placement='right'][data-state='open'] {
+  animation: ui-spring-edge-in calc(var(--ui-duration-slow) * 1.92) var(--ui-spring-smooth);
+  --_edge: translateX(100%);
+}
+
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring'][data-placement='left'][data-state='open'] {
+  animation: ui-spring-edge-in calc(var(--ui-duration-slow) * 1.92) var(--ui-spring-smooth);
+  --_edge: translateX(-100%);
+}
+
+.ui-modal-layer > .ui-modal-layer__panel[data-motion='spring'][data-placement='bottom'][data-state='open'] {
+  animation: ui-spring-edge-in calc(var(--ui-duration-slow) * 1.92) var(--ui-spring-smooth);
+  --_edge: translateY(100%);
+}
+
+@keyframes ui-spring-modal-in {
+  from {
+    transform: perspective(900px) translate(var(--_from-x), var(--_from-y)) rotateX(var(--_tilt-x)) rotateY(var(--_tilt-y)) scale(0.94);
+  }
+}
+
+@keyframes ui-spring-modal-out {
+  to {
+    opacity: 0;
+    transform: perspective(900px) translate(calc(var(--_from-x) / 3), calc(var(--_from-y) / 3)) scale(0.97);
+  }
+}
+
+@keyframes ui-spring-edge-in {
+  from {
+    transform: var(--_edge);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-animate-spring[data-state],
+  .ui-modal-layer > .ui-modal-layer__panel[data-motion='spring'][data-state] {
+    animation-duration: 1ms;
+  }
+}

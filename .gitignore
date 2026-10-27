@@ -1,0 +1,14 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# данные приложения и результаты
+cache/
+out/
+build/
+dist/
+packaging/app.ico
+
+# локальная конфигурация редактора/агента
+.claude/
